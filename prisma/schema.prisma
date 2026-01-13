@@ -1,0 +1,48 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Alumnus {
+  id                String   @id @default(uuid())
+  email             String   @unique
+  password          String?
+  country           String
+  state             String?
+  city              String?
+  course            String
+  addressComp       String?  @map("address_complement")
+  bio               String?
+  birthDate         DateTime @map("birth_date")
+  company           String?
+  createdAt         DateTime @default(now()) @map("created_at")
+  fullName          String   @map("full_name")
+  graduationYear    Int      @map("graduation_year")
+  linkedinUrl       String?  @map("linkedin_url")
+  phone             String
+  preferredName     String?  @map("preferred_name")
+  profilePicture    String?  @map("profile_picture")
+  role              String?
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  yearsOfExperience Int?     @map("years_of_experience")
+  skills            String[]
+  user_id           String?  @unique @db.Uuid
+  users             users?   @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("alumni")
+}
+
+model users {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  full_name     String
+  email         String   @unique
+  password_hash String
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime @default(now()) @db.Timestamptz(6)
+  alumni        Alumnus?
+}
