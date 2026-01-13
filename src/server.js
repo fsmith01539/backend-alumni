@@ -9,16 +9,15 @@ const meRoutes = require('./routes/me.routes');
 
 require('dotenv').config();
 
-// Importação das rotas (as que você criou na pasta routes)
-// const alumniRoutes = require('./routes/alumni.routes');
-
 const app = express();
 
 // --- Middlewares Globais ---
-app.use(helmet()); // Proteção de cabeçalhos HTTP
-app.use(cors()); // Libera acesso para o Front-end
-app.use(express.json()); // Permite que o servidor entenda JSON
+app.use(helmet());
+app.use(cors());
+app.use(express.json());
 app.use(logger);
+
+// --- Rotas ---
 app.use('/alumni', alumniRoutes);
 app.use('/auth', authRoutes);
 app.use('/me', meRoutes);
@@ -32,16 +31,19 @@ app.get('/', (req, res) => {
   });
 });
 
-// --- Configuração de Rotas Futuras ---
-// app.use('/alumni', alumniRoutes);
-
-// --- Inicialização do Servidor ---
-const PORT = process.env.PORT || 3001;
+// --- Middleware de Erro (DEVE ser o último antes do export/listen) ---
 app.use(errorMiddleware);
-app.listen(PORT, () => {
-  console.log(`
-  🚀 Servidor voando!
-  📡 URL: http://localhost:${PORT}
-  🛠️  Ambiente pronto para JA, TD e F.
-  `);
-});
+
+// --- Inicialização do Servidor (Local) ---
+const PORT = process.env.PORT || 3001;
+
+// Na Vercel, o 'listen' não é estritamente necessário, 
+// mas mantemos para você rodar localmente com 'npm run dev'
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`🚀 Servidor voando em http://localhost:${PORT}`);
+  });
+}
+
+// --- ESSENCIAL PARA VERCEL ---
+module.exports = app;
